@@ -15,7 +15,11 @@
 				<td>{{ tweet.created_at }}</td>
 				<td>{{ tweet.text }}</td>
 				<td>{{ tweet.retweets }}</td>
-				<td>{{ links|join:" , "  }}</td>
+				<td>
+				{% for link in links %}
+					<a href="{{ link }}">{{ link }}</a>
+				{% endfor %}
+				</td>
 			</tr>
 		{% endfor %}
 		</table>
