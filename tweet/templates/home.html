@@ -3,8 +3,21 @@
 		<title>Links in tweets</title>
 	</head>
 	<body>
-		{% for link, count in links %}
-			{{ link }} {{ count }}<br />
+		<table>
+			<tr>
+				<th>Fecha y Hora</th>
+				<th>Mensaje</th>
+				<th>Retweets</th>
+				<th>Links</th>
+			</tr>
+		{% for tweet, links in tweets %}
+			<tr>
+				<td>{{ tweet.created_at }}</td>
+				<td>{{ tweet.text }}</td>
+				<td>{{ tweet.retweets }}</td>
+				<td>{{ links|join:" , "  }}</td>
+			</tr>
 		{% endfor %}
+		</table>
 	</body>
 </html>
