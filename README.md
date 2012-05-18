@@ -2,6 +2,7 @@ links-in-tweets
 ===============
 
 How does this works?
+
 1. Sync the database
     `python manage.py syncdb`
 
