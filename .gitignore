@@ -3,6 +3,9 @@
 # Databases
 *.db
 
+# Virtualenv
+venv
+
 # Packages
 *.egg
 *.egg-info

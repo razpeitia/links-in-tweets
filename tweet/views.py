@@ -47,26 +47,6 @@ def anterior_jueves_4pm(now):
         now += datetime.timedelta(days=7)
     now -= datetime.timedelta(days=14)
     return now
-
-
-class LongLinkThread(threading.Thread):
-    def __init__(self, queue):
-        threading.Thread.__init__(self)
-        self.queue = queue
-
-    def run(self):
-        while True:
-            url, link = self.queue.get()
-            for _ in xrange(5): #Numero de intentos
-                try:
-                    response = requests.get(url).text
-                    long_link = json.loads(response)['long-url']
-                    link.long_link = long_link
-                    link.save()
-                    break
-                except Exception, e:
-                    pass
-            self.queue.task_done()
             
 def crawl_tweets_for(username, since):
     for tweet in all_tweets_since(username, since):
