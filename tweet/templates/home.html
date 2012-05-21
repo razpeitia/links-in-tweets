@@ -6,19 +6,19 @@
 		<table>
 			<tr>
 				<th>Fecha y Hora</th>
-				<th>Mensaje</th>
+				<th>Autor</th>
+				<th>Tweet</th>
 				<th>Retweets</th>
 				<th>Links</th>
 			</tr>
-		{% for tweet, links in tweets %}
+		{% for link, tweet in tweets %}
 			<tr>
 				<td>{{ tweet.created_at }}</td>
+				<td>{{ tweet.username }}</td>
 				<td>{{ tweet.text }}</td>
 				<td>{{ tweet.retweets }}</td>
 				<td>
-				{% for link in links %}
-					<a href="{{ link }}">{{ link|slice:":50" }}</a>
-				{% endfor %}
+				<a href="{{ link }}">{{ link|slice:":50" }}</a>
 				</td>
 			</tr>
 		{% endfor %}

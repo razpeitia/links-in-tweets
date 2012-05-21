@@ -1,13 +1,12 @@
-from collections import Counter
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
-from tweet.models import Tweet, Link
-import Queue
+from tweet.models import Tweet, Link, UserTweet
+from urlparse import urlsplit, urlunsplit
 import datetime
 import json
 import re
 import requests
-import threading
+from collections import OrderedDict
 
 def all_tweets(username, max_id):
     url = "https://api.twitter.com/1/statuses/user_timeline.json?include_entities=true&screen_name=%s&count=200" % (username,)
@@ -37,21 +36,17 @@ def all_tweets_since(username, since):
             max_id = tweet['id_str']
     return tweets
 
-def anterior_jueves_4pm(now):
-    _4PM = datetime.time(hour=16)
+def anterior_jueves(now):
+    _12AM = datetime.time(hour=0)
     _JUE = 3  # Monday=0 for weekday()
-    old_now = now
-    now += datetime.timedelta((_JUE - now.weekday()) % 7)
-    now = now.combine(now.date(), _4PM)
-    if old_now >= now:
-        now += datetime.timedelta(days=7)
-    now -= datetime.timedelta(days=14)
+    now -= datetime.timedelta((_JUE - now.weekday()) % 7)
+    now = now.combine(now.date(), _12AM)
     return now
-            
+
 def crawl_tweets_for(username, since):
     for tweet in all_tweets_since(username, since):
         try:
-            tweet_record = Tweet.objects.get(tweet_id=tweet['id'])
+            tweet_record = Tweet.objects.get(pk=tweet['id'])
             tweet_record.retweets = tweet['retweet_count']
         except Tweet.DoesNotExist:
             tweet_data = {
@@ -59,19 +54,23 @@ def crawl_tweets_for(username, since):
                       'text': tweet['text'], 
                       'created_at': tweet['created_at'], 
                       'retweets': tweet['retweet_count'],
+                      'username': UserTweet.objects.get(username=username),
                    }
             tweet_record = Tweet(**tweet_data)
         tweet_record.save()
         
 def crawl(request, username=None, year=None, month=None, day=None):
-    crawl_tweets_for(username, datetime.datetime(int(year), int(month), int(day)))
+    crawl_tweets_for(username, 
+                     datetime.datetime(int(year), int(month), int(day)))
     return HttpResponse("OK")
 
 def extract_all_links(request):
     tweets = list(Tweet.objects.all().order_by('-retweets', '-created_at'))
     for tweet in tweets:
         for short_link in all_links_in(tweet):
-            link, created = Link.objects.get_or_create(short_link=short_link, defaults={'long_link':""})
+            link, created = \
+            Link.objects.get_or_create(short_link=normalize(short_link), 
+                                       defaults={'long_link':""})
             link.save()
     return HttpResponse("OK")
 
@@ -82,23 +81,34 @@ def expand_all_links(request):
         try:
             response = requests.get(url).text
             long_link = json.loads(response)['long-url']
-            link.long_link = long_link
+            link.long_link = normalize(long_link)
             link.save()
         except:
             pass
         
     return HttpResponse("OK")
 
+def normalize(link):
+    link = link.rstrip("/")
+    scheme, netloc, path, qs, anchor = urlsplit(link)
+    netloc = netloc.lower()
+    netloc = netloc.lstrip("www.")
+    return urlunsplit((scheme, netloc, path, qs, anchor))
+
 def home(request):
-    tweets = list(Tweet.objects.all().order_by('-retweets', '-created_at'))
+    tweets = list(Tweet.objects.all().filter(retweets__gt=0).order_by('-retweets', '-created_at'))
     links = list(Link.objects.all())
-    links = {link.short_link: link.long_link for link in links}
+    translate_links = {link.short_link: link.long_link for link in links}
         
-    response = []
+    response = OrderedDict()
     for tweet in tweets:
-        links_in_tweet = all_links_in(tweet)
-        links_in_tweet = map(lambda x: links[x], links_in_tweet)
-        if links_in_tweet:
-            response.append((tweet, links_in_tweet))
-    response = {'tweets': response,}
+        links_in_tweet = [normalize(link) for link in all_links_in(tweet)]
+        links_in_tweet = [translate_links[link] for link in links_in_tweet]
+        if links_in_tweet and 'http://mejorando.la' not in links_in_tweet:
+            links_in_tweet = links_in_tweet[0]
+            if links_in_tweet not in response:
+                response[links_in_tweet] = tweet
+            else:
+                response[links_in_tweet].retweets += tweet.retweets 
+    response = {'tweets': response.iteritems(),}
     return render_to_response('home.html', response)
