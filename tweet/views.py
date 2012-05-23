@@ -93,7 +93,8 @@ def normalize(link):
     link = link.rstrip("/")
     scheme, netloc, path, qs, anchor = urlsplit(link)
     netloc = netloc.lower()
-    netloc = netloc.lstrip("www.")
+    if netloc.startswith("www."):
+        netloc = netloc[4:]
     path = urllib.unquote(path)
     path = urllib.quote(path, '/%')
     qs = urllib.unquote_plus(qs)
