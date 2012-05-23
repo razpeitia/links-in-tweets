@@ -100,7 +100,7 @@ def home(request):
     links = list(Link.objects.all())
     translate_links = {link.short_link: link.long_link for link in links}
         
-    response = OrderedDict()
+    response = {}
     for tweet in tweets:
         links_in_tweet = [normalize(link) for link in all_links_in(tweet)]
         links_in_tweet = [translate_links[link] for link in links_in_tweet]
@@ -109,6 +109,7 @@ def home(request):
             if links_in_tweet not in response:
                 response[links_in_tweet] = tweet
             else:
-                response[links_in_tweet].retweets += tweet.retweets 
-    response = {'tweets': response.iteritems(),}
+                response[links_in_tweet].retweets += tweet.retweets
+     
+    response = {'tweets': sorted(response.items(), key=lambda x: x[1].retweets, reverse=True),}
     return render_to_response('home.html', response)
