@@ -1,27 +1,126 @@
+<!doctype html>
 <html>
-	<head>
-		<title>Links en Tweets de @mejorandola</title>
-	</head>
-	<body>
-		<table style="border=1px solid #000;">
-			<tr>
-				<th>RTs</th>
-				<th>Link</th>
-				<th>Autor</th>
-				<th>Timestamp</th>
-				<th>Tweet</th>
-			</tr>
-		{% for link, tweet in tweets %}
-			<tr>
-				<td>{{ tweet.retweets }}</td>
-				<td><a href="{{ link }}">{{ link|slice:":50" }}</a></td>
-				<td>{{ tweet.username }}</td>
-				<td>{{ tweet.created_at }}</td>				
-				<td>{{ tweet.text }}</td>
-				<td>
-				</td>
-			</tr>
-		{% endfor %}
-		</table>
-	</body>
+<head>
+	<meta charset="utf-8" />
+	<title>Mejorando.la Links in Tweets</title>
+
+	<style>
+	* {
+		margin:0;
+		padding:0;
+	}
+
+	body {
+		font-family:monaco;
+		font-size:12px;
+	}
+
+
+	.item {
+		margin:5px;
+		background:#3b3b3b;
+		color:white;
+		padding:5px;
+		border-radius:2px;
+		overflow: hidden;
+		width:600px;
+	}
+
+	.link a {
+		color:lightgray;
+	}
+
+	.retweets {
+		font-size:30px;
+		margin:5px 10px 15px;
+		float:left;
+	}
+
+	a {
+		color:orange;
+		text-decoration:none;
+	}
+
+	a:hover {
+		text-decoration:underline;
+	}
+
+	.user img {
+		border-radius:2px;
+		float:left;
+		margin:0 10px;
+	}
+
+	.link {
+		text-align:right;
+	}
+
+	.date {
+		float:right;
+		color:lightgray;
+		font-size:11px;
+	}
+
+	button {
+		border:0;
+		background:#d29113;
+		color:white;
+		padding:10px 20px;
+		border-bottom:5px solid #9b2e2e;
+		cursor: pointer;
+	}
+
+	button:hover {
+		background:#eac030;
+	}
+
+
+	h1 {
+		margin:10px 0;
+		text-align:center;
+	}
+
+	#actualizar {
+		display: block;
+		margin:5px;
+	}
+
+	</style>
+</head>
+<body>
+
+	<h1>Links de la semana</h1>
+
+	<button id="actualizar">actualizar</button>
+
+
+	{% for link, tweet in tweets %}
+	<div class="item">
+		<div class="link">
+
+			<a href="{{ link }}" target="_blank">{{ link|cut:"https://"|cut:"http://"|slice:"50" }}</a>
+		</div>
+
+		<div class="retweets">
+			{{ tweet.retweets }}
+		</div>
+
+		<div>
+			<div class="user">
+				<strong>{{ tweet.username }}</strong>
+				<img src="https://si0.twimg.com/profile_images/1159675243/fmic_normal.jpg" alt="{{ tweet.username }}" />
+			</div>
+
+			<div class="content">
+				<p>{{ tweet.text }}</p>
+			</div>
+
+			<div class="date">
+				<p>{{ tweet.created_at|date:"F d, fa" }}</p>
+			</div>
+		</div>
+	</div>
+	{% endfor %}
+
+</body>
 </html>
