@@ -1,24 +1,24 @@
 <html>
 	<head>
-		<title>Links in tweets</title>
+		<title>Links en Tweets de @mejorandola</title>
 	</head>
 	<body>
 		<table style="border=1px solid #000;">
 			<tr>
-				<th>Fecha y Hora</th>
+				<th>RTs</th>
+				<th>Link</th>
 				<th>Autor</th>
+				<th>Timestamp</th>
 				<th>Tweet</th>
-				<th>Retweets</th>
-				<th>Links</th>
 			</tr>
 		{% for link, tweet in tweets %}
 			<tr>
-				<td>{{ tweet.created_at }}</td>
-				<td>{{ tweet.username }}</td>
-				<td>{{ tweet.text }}</td>
 				<td>{{ tweet.retweets }}</td>
+				<a href="{{ link }}">{{ link|slice:":50" }}</a>	
+				<td>{{ tweet.username }}</td>
+				<td>{{ tweet.created_at }}</td>				
+				<td>{{ tweet.text }}</td>
 				<td>
-				<a href="{{ link }}">{{ link|slice:":50" }}</a>
 				</td>
 			</tr>
 		{% endfor %}
