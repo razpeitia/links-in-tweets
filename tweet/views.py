@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from tweet.models import Tweet, Link, UserTweet
@@ -6,7 +7,7 @@ import datetime
 import json
 import re
 import requests
-from collections import OrderedDict
+import urllib
 
 def all_tweets(username, max_id):
     url = "https://api.twitter.com/1/statuses/user_timeline.json?include_entities=true&screen_name=%s&count=200" % (username,)
@@ -93,6 +94,8 @@ def normalize(link):
     scheme, netloc, path, qs, anchor = urlsplit(link)
     netloc = netloc.lower()
     netloc = netloc.lstrip("www.")
+    path = urllib.quote(path, '/%')
+    qs = urllib.quote_plus(qs, ':&=')
     return urlunsplit((scheme, netloc, path, qs, anchor))
 
 def home(request):
