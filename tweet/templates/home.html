@@ -14,7 +14,7 @@
 		{% for link, tweet in tweets %}
 			<tr>
 				<td>{{ tweet.retweets }}</td>
-				<a href="{{ link }}">{{ link|slice:":50" }}</a>	
+				<td><a href="{{ link }}">{{ link|slice:":50" }}</a></td>
 				<td>{{ tweet.username }}</td>
 				<td>{{ tweet.created_at }}</td>				
 				<td>{{ tweet.text }}</td>
