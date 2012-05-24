@@ -1,10 +1,8 @@
 <!doctype html>
 <html>
-<head>
-	<meta charset="utf-8" />
-	<title>Mejorando.la Links in Tweets</title>
-
-	<style>
+	<head>
+		<title>Links en Tweets de @mejorandola</title>
+		<style>
 	* {
 		margin:0;
 		padding:0;
@@ -86,15 +84,9 @@
 	}
 
 	</style>
-</head>
-<body>
-
-	<h1>Links de la semana</h1>
-
-	<button id="actualizar">actualizar</button>
-
-
-	{% for link, tweet in tweets %}
+	</head>
+	<body>
+	{% for link, tweet in response %}
 	<div class="item">
 		<div class="link">
 
@@ -108,7 +100,7 @@
 		<div>
 			<div class="user">
 				<strong>{{ tweet.username }}</strong>
-				<img src="https://si0.twimg.com/profile_images/1159675243/fmic_normal.jpg" alt="{{ tweet.username }}" />
+				<img src="http://img.tweetimag.es/i/{{ tweet.username }}" alt="{{ tweet.username }}" />
 			</div>
 
 			<div class="content">
@@ -122,5 +114,7 @@
 	</div>
 	{% endfor %}
 
-</body>
+	<a href="https://github.com/razpeitia/links-in-tweets"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+
+	</body>
 </html>
