@@ -3,7 +3,7 @@
 		<title>Links en Tweets de @mejorandola</title>
 	</head>
 	<body>
-		<table style="border=1px solid #000;">
+		<table>
 			<tr>
 				<th>RTs</th>
 				<th>Link</th>
@@ -11,10 +11,10 @@
 				<th>Timestamp</th>
 				<th>Tweet</th>
 			</tr>
-		{% for link, tweet in tweets %}
+		{% for link, tweet in response %}
 			<tr>
 				<td>{{ tweet.retweets }}</td>
-				<td><a href="{{ link }}">{{ link|slice:":50" }}</a></td>
+				<td><a href="{{ tweet.link_set.all.0.long_link }}">{{ tweet.link_set.all.0.long_link|slice:":50" }}</a></td>
 				<td>{{ tweet.username }}</td>
 				<td>{{ tweet.created_at }}</td>				
 				<td>{{ tweet.text }}</td>
