@@ -28,7 +28,7 @@ def expand_all_links(request):
 
 
 def home(request):
-    tweets = list(Tweet.objects.all().filter(retweets__gt=0, link__gt=0))
+    tweets = list(Tweet.objects.all().filter(retweets__gt=0, link__isnull=False))
     d = {}
     for tweet in tweets:
         link = tweet.link_set.all()[0].long_link
