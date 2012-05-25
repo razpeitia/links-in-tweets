@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
-from tweet.models import Tweet, Link
+from tweet.models import Tweet, Link, UserTweet
 
         
 def crawl(request, username=None):
@@ -28,7 +28,12 @@ def expand_all_links(request):
 
 
 def home(request):
-    tweets = list(Tweet.objects.all().filter(retweets__gt=0, link__isnull=False).order_by('-retweets', '-created_at'))
+    users = list(UserTweet.objects.all())
+    tweets = [Tweet.objects.all().filter(retweets__gt=0, link__isnull=False, username__username=user, created_at__gte=user.last_date_to_crawl) for user in users]
+    
+    tweets = reduce(lambda x, y: x | y, tweets)
+    
+    tweets.order_by('-retweets', '-created_at')
     d = {}
     for tweet in tweets:
         link = tweet.link_set.all()[0].long_link
