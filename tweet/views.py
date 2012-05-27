@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from tweet.models import Tweet, Link, UserTweet
+from multiprocessing.pool import ThreadPool
 
         
 def crawl(request, username=None):
@@ -22,8 +23,18 @@ def extract_all_links(request):
 
 def expand_all_links(request):
     links = list(Link.objects.all().filter(long_link__exact=""))
-    for link in links:
-        link.expand()
+
+    def get_long_link(link):
+        for _ in range(5):
+            try:
+                link.expand()
+                break
+            except Exception:
+                pass
+    
+    p = ThreadPool(4)
+    p.map(get_long_link, links)
+    
     return HttpResponse("OK")
 
 
