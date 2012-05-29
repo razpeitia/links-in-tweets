@@ -7,9 +7,10 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'tweet.views.home'),
-    url(r'^crawl/(?P<username>[^/]+)/$', 'tweet.views.crawl'),
-    url(r'^extract_all_links/$', 'tweet.views.extract_all_links'),
-    url(r'^expand_all_links/$', 'tweet.views.expand_all_links'),
+    url(r'^update/$', 'tweet.views.update'),
+    #url(r'^crawl/(?P<username>[^/]+)/$', 'tweet.views.crawl'),
+    #url(r'^extract_all_links/$', 'tweet.views.extract_all_links'),
+    #url(r'^expand_all_links/$', 'tweet.views.expand_all_links'),
     # url(r'^diablo3/', include('diablo3.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:

@@ -25,18 +25,34 @@ def expand_all_links(request):
     links = list(Link.objects.all().filter(long_link__exact=""))
 
     def get_long_link(link):
-        for _ in range(5):
+        for _ in xrange(5):
             try:
                 link.expand()
                 break
             except Exception:
                 pass
     
-    p = ThreadPool(4)
+    number_of_threads = 0
+    if links:
+        if len(links) >= 4:
+            number_of_threads = 4
+        else:
+            number_of_threads = len(links)
+    else:
+        return "OK"
+    p = ThreadPool(number_of_threads)
     p.map(get_long_link, links)
     
     return HttpResponse("OK")
 
+
+def update(request):
+    users = list(UserTweet.objects.all())
+    for user in users:
+        crawl(request, user.username)
+    extract_all_links(request)
+    expand_all_links(request)
+    return HttpResponse("OK")
 
 def home(request):
     users = list(UserTweet.objects.all())
