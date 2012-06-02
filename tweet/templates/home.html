@@ -100,7 +100,7 @@
 		<div>
 			<div class="user">
 				<strong>{{ tweet.username }}</strong>
-				<img src="http://img.tweetimag.es/i/{{ tweet.username }}" alt="{{ tweet.username }}" />
+				<img src="https://api.twitter.com/1/users/profile_image?screen_name={{ tweet.username }}" alt="{{ tweet.username }}" />
 			</div>
 
 			<div class="content">
