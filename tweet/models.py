@@ -23,7 +23,7 @@ class Tweet(models.Model):
     created_at = models.DateTimeField()
     text = models.TextField(max_length=140)
     retweets = models.IntegerField()
-    r_links = re.compile(r"(http://[^ ]+)")
+    r_links = re.compile(r"(http://[^ )]+)")
     
     @staticmethod
     def all_tweets(username, max_id):

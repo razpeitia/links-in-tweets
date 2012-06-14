@@ -17,16 +17,6 @@ How does this works?
     
     /admin/
 
-3. Crawl the user since some specific date.
+4. Update
 
-    /crawl/:username/
-
-
-4. Extract all the links in the tweets.
-
-    /extract_all_links/
-
-
-5. Expand all the links.
-
-    /expand_all_links/
+    /update/
