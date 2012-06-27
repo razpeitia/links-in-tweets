@@ -43,14 +43,81 @@ def update(request):
     expand_all_links(request)
     return HttpResponse("OK")
 
+def mentions(request):
+    users = UserTweet.toCrawl()
+    tweets = [Tweet.objects.filter(retweets__gt=0, user_mentions__isnull=False, username=user, created_at__gte=user.last_date_to_crawl) for user in users]
+    tweets = reduce(lambda x, y: x | y, tweets)
+    tweets = list(set(tweets))
+    
+    d = {}
+    for tweet in tweets:
+        user_mentions = tweet.all_user_mentions()
+        for user_mention in user_mentions:
+            if user_mention in d:
+                d[user_mention].append(tweet)
+            else:
+                d[user_mention] = [tweet]
+    
+    for user_mention, tweets in d.iteritems():
+        retweets = sum(tweet.retweets for tweet in tweets)
+        tweet = min(tweets, key=lambda tweet: tweet.created_at)
+        d[user_mention] = {'tweet': tweet, 'retweets': retweets}
+    response = {'response': sorted(d.items(), key=lambda tweet: (tweet[1]['retweets'], tweet[1]['tweet'].created_at), reverse=True)}
+    
+    return render_to_response('mentions.html', response)
+
+def user_mentions(request, username=None):
+    user = UserTweet(pk=username)
+    options = {}
+    if user.last_date_to_crawl:
+        options['created_at__gte'] = user.last_date_to_crawl
+    tweets = list(Tweet.objects.filter(retweets__gt=0, user_mentions__in=[user], **options).order_by('-retweets', '-created_at'))
+    response = {'response': zip([username] * len(tweets), tweets)}
+    return render_to_response('user_mentions.html', response)
+        
+        
+
+def hashtags(request):
+    users = UserTweet.toCrawl()
+    tweets = [Tweet.objects.filter(retweets__gt=0, hashtags__isnull=False, username=user, created_at__gte=user.last_date_to_crawl) for user in users]
+    tweets = reduce(lambda x, y: x | y, tweets)
+    tweets = list(set(tweets))
+    
+    d = {}
+    for tweet in tweets:
+        hashtags = tweet.all_hashtags()
+        for hashtag in hashtags:
+            if hashtag in d:
+                d[hashtag].append(tweet)
+            else:
+                d[hashtag] = [tweet]
+    
+    for hashtag, tweets in d.iteritems():
+        retweets = sum(tweet.retweets for tweet in tweets)
+        tweet = min(tweets, key=lambda tweet: tweet.created_at)
+        d[hashtag] = {'tweet': tweet, 'retweets': retweets} 
+    
+    response = {'response': sorted(d.items(), key=lambda tweet: (tweet[1]['retweets'], tweet[1]['tweet'].created_at), reverse=True)}
+    return render_to_response('hashtags.html', response)
+
+def hashtag(request, hashtag):
+    users = UserTweet.toCrawl()
+    tweets = [Tweet.objects.filter(retweets__gt=0, hashtags__in=[hashtag], username=user, created_at__gte=user.last_date_to_crawl) for user in users]
+    tweets = reduce(lambda x, y: x | y, tweets)
+    tweets = list(set(tweets))
+    tweets = sorted(tweets, key=lambda tweet: (tweet.retweets, tweet.created_at), reverse=True)
+    
+    response = {'response': zip([hashtag] * len(tweets), tweets)}
+    
+    return render_to_response('hashtag.html', response)
+
 def home(request):
     """Show all the tweets that have at least one link in the tweet"""
-    users = list(UserTweet.objects.filter(last_date_to_crawl__isnull=False))
-    tweets = [Tweet.objects.filter(retweets__gt=0, links__isnull=False, username__username=user, created_at__gte=user.last_date_to_crawl) for user in users]
+    users = UserTweet.toCrawl()
+    tweets = [Tweet.objects.filter(retweets__gt=0, links__isnull=False, username=user, created_at__gte=user.last_date_to_crawl) for user in users]
     
     tweets = reduce(lambda x, y: x | y, tweets)
     
-    tweets.order_by('-retweets', '-created_at')
     d = {}
     for tweet in tweets:
         links = tweet.all_long_links()

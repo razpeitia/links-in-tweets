@@ -94,11 +94,10 @@
 	</style>
 	</head>
 	<body>
-	{% for link, tweet in response %}
+	{% for hashtag, tweet in response %}
 	<div class="item">
 		<div class="link">
-
-			<a href="{{ link }}" target="_blank">{{ link|cut:"https://"|cut:"http://"|slice:"50" }}</a>
+			{{ hashtag }}
 		</div>
 
 		<div class="retweets">

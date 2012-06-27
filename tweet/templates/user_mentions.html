@@ -94,11 +94,10 @@
 	</style>
 	</head>
 	<body>
-	{% for link, tweet in response %}
+	{% for users_mentions, tweet in response %}
 	<div class="item">
 		<div class="link">
-
-			<a href="{{ link }}" target="_blank">{{ link|cut:"https://"|cut:"http://"|slice:"50" }}</a>
+			<a href="/mentions/{{ users_mentions|cut:"@" }}" target="_blank">{{ users_mentions }}</a>
 		</div>
 
 		<div class="retweets">
@@ -107,7 +106,7 @@
 
 		<div>
 			<div class="user">
-				<strong>{{ tweet.username }}</strong>
+				<strong>{{ tweets.0.username }}</strong>
 				<img src="https://api.twitter.com/1/users/profile_image?screen_name={{ tweet.username }}" alt="{{ tweet.username }}" />
 			</div>
 

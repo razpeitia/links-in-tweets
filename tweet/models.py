@@ -13,14 +13,18 @@ class UserTweet(models.Model):
     username = models.CharField(max_length=80, primary_key=True)
     last_date_to_crawl = models.DateTimeField(blank=True, null=True)
     
+    @staticmethod
+    def toCrawl():
+        return list(UserTweet.objects.filter(last_date_to_crawl__isnull=False))
+    
     def __str__(self):
-        return "%s" % (self.username,)
+        return "@%s" % (self.username,)
     
     def __unicode__(self):
         return u"%s" % (self.__str__(),)
     
     def __repr__(self):
-        return u"@%s" % (self.__str__(),)
+        return u"%s" % (self.__str__(),)
     
 
 class Tweet(models.Model):

@@ -94,11 +94,10 @@
 	</style>
 	</head>
 	<body>
-	{% for link, tweet in response %}
+	{% for hashtag, tweet in response %}
 	<div class="item">
 		<div class="link">
-
-			<a href="{{ link }}" target="_blank">{{ link|cut:"https://"|cut:"http://"|slice:"50" }}</a>
+			<a href="/hashtag/{{ hashtag|cut:"#" }}" target="_blank">{{ hashtag }}</a>
 		</div>
 
 		<div class="retweets">
@@ -107,16 +106,16 @@
 
 		<div>
 			<div class="user">
-				<strong>{{ tweet.username }}</strong>
-				<img src="https://api.twitter.com/1/users/profile_image?screen_name={{ tweet.username }}" alt="{{ tweet.username }}" />
+				<strong>{{ tweet.tweet.username }}</strong>
+				<img src="https://api.twitter.com/1/users/profile_image?screen_name={{ tweet.tweet.username }}" alt="{{ tweet.tweet.username }}" />
 			</div>
 
 			<div class="content">
-				<p>{{ tweet.text }}</p>
+				<p>{{ tweet.tweet.text }}</p>
 			</div>
 
 			<div class="date">
-				<p>{{ tweet.created_at|date:"F d, fa" }}</p>
+				<p>{{ tweet.tweet.created_at|date:"F d, fa" }}</p>
 			</div>
 		</div>
 	</div>
