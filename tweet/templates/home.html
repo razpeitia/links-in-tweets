@@ -48,6 +48,14 @@
 		float:left;
 		margin:0 10px;
 	}
+	
+	.mentions {
+		float: rigth;
+	}
+	
+	.hashtags {
+	    float: rigth;
+	}
 
 	.link {
 		text-align:right;
@@ -106,6 +114,20 @@
 			<div class="content">
 				<p>{{ tweet.text }}</p>
 			</div>
+			
+			{% if tweet.all_user_mentions %}
+			<div class="mentions">
+				<strong>User mentions: </strong>
+				{{ tweet.all_user_mentions }}
+			</div>
+			{% endif %}
+			
+			{% if tweet.all_hashtags %}
+			<div class="hashtag">
+				<strong>Hashtags: </strong>
+				{{ tweet.all_hashtags }}
+			</div>
+			{% endif %}
 
 			<div class="date">
 				<p>{{ tweet.created_at|date:"F d, fa" }}</p>
