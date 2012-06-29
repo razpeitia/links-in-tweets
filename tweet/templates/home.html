@@ -107,16 +107,16 @@
 
 		<div>
 			<div class="user">
-				<strong>{{ tweet.username }}</strong>
-				<img src="https://api.twitter.com/1/users/profile_image?screen_name={{ tweet.username }}" alt="{{ tweet.username }}" />
+				<strong>{{ tweet.tweet.username }}</strong>
+				<img src="https://api.twitter.com/1/users/profile_image?screen_name={{ tweet.tweet.username }}" alt="{{ tweet.tweet.username }}" />
 			</div>
 
 			<div class="content">
-				<p>{{ tweet.text }}</p>
+				<p>{{ tweet.tweet.text }}</p>
 			</div>
 
 			<div class="date">
-				<p>{{ tweet.created_at|date:"F d, fa" }}</p>
+				<p>{{ tweet.tweet.created_at|date:"F d, fa" }}</p>
 			</div>
 		</div>
 	</div>

@@ -97,7 +97,7 @@
 	{% for users_mentions, tweet in response %}
 	<div class="item">
 		<div class="link">
-			<a href="/mentions/{{ users_mentions|cut:"@" }}" target="_blank">{{ users_mentions }}</a>
+			{{ users_mentions }}
 		</div>
 
 		<div class="retweets">

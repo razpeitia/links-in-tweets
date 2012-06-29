@@ -67,11 +67,13 @@ def mentions(request):
     return render_to_response('mentions.html', response)
 
 def user_mentions(request, username=None):
-    user = UserTweet(pk=username)
-    options = {}
-    if user.last_date_to_crawl:
-        options['created_at__gte'] = user.last_date_to_crawl
-    tweets = list(Tweet.objects.filter(retweets__gt=0, user_mentions__in=[user], **options).order_by('-retweets', '-created_at'))
+    username = UserTweet(pk=username)
+    users = UserTweet.toCrawl()
+        
+    tweets = [Tweet.objects.filter(retweets__gt=0, user_mentions__in=[username], username=user, created_at__gt=user.last_date_to_crawl) for user in users]
+    tweets = reduce(lambda x, y: x | y, tweets)
+    tweets = list(set(tweets))
+    tweets = sorted(tweets, key=lambda tweet: (tweet.retweets, tweet.created_at), reverse=True) 
     response = {'response': zip([username] * len(tweets), tweets)}
     return render_to_response('user_mentions.html', response)
         
@@ -111,12 +113,18 @@ def hashtag(request, hashtag):
     
     return render_to_response('hashtag.html', response)
 
+def links(request):
+    pass
+
+def link(request, link):
+    pass
+
 def home(request):
     """Show all the tweets that have at least one link in the tweet"""
     users = UserTweet.toCrawl()
     tweets = [Tweet.objects.filter(retweets__gt=0, links__isnull=False, username=user, created_at__gte=user.last_date_to_crawl) for user in users]
-    
     tweets = reduce(lambda x, y: x | y, tweets)
+    tweets = list(set(tweets))
     
     d = {}
     for tweet in tweets:
@@ -125,9 +133,13 @@ def home(request):
             continue
         for link in links:
             if link in d:
-                d[link].retweets += tweet.retweets
+                d[link].append(tweet)
             else:
-                d[link] = tweet
-            
-    response = {'response': sorted(d.items(), key=lambda x: (x[1].retweets, x[1].created_at), reverse=True)}
+                d[link] = [tweet]
+    
+    for link, tweets in d.iteritems():
+        retweets = sum(tweet.retweets for tweet in tweets)
+        tweet = min(tweets, key=lambda tweet: tweet.created_at)
+        d[link] = {'tweet': tweet, 'retweets': retweets}
+    response = {'response': sorted(d.items(), key=lambda x: (x[1]['retweets'], x[1]['tweet'].created_at), reverse=True)}
     return render_to_response('home.html', response)
