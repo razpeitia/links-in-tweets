@@ -114,10 +114,36 @@ def hashtag(request, hashtag):
     return render_to_response('hashtag.html', response)
 
 def links(request):
-    pass
+    """Show all the tweets that have at least one link in the tweet"""
+    users = UserTweet.toCrawl()
+    tweets = [Tweet.objects.filter(retweets__gt=0, links__isnull=False, username=user, created_at__gte=user.last_date_to_crawl) for user in users]
+    tweets = reduce(lambda x, y: x | y, tweets)
+    tweets = list(set(tweets))
+    
+    d = {}
+    for tweet in tweets:
+        links = tweet.all_long_links()
+        for link in links:
+            if link in d:
+                d[link].append(tweet)
+            else:
+                d[link] = [tweet]
+    
+    for link, tweets in d.iteritems():
+        retweets = sum(tweet.retweets for tweet in tweets)
+        tweet = min(tweets, key=lambda tweet: tweet.created_at)
+        d[link] = {'tweet': tweet, 'retweets': retweets}
+    response = {'response': sorted(d.items(), key=lambda x: (x[1]['retweets'], x[1]['tweet'].created_at), reverse=True)}
+    return render_to_response('links.html', response)
 
 def link(request, link):
-    pass
+    users = UserTweet.toCrawl()
+    tweets = [Tweet.objects.filter(retweets__gt=0, links__long_link__in=[link], username=user, created_at__gte=user.last_date_to_crawl) for user in users]
+    tweets = reduce(lambda x, y: x | y, tweets)
+    tweets = list(set(tweets))
+    tweets = sorted(tweets, key=lambda tweet: (tweet.retweets, tweet.created_at), reverse=True)
+    response = {'response': zip([link] * len(tweets), tweets)}
+    return render_to_response('link.html', response)
 
 def home(request):
     """Show all the tweets that have at least one link in the tweet"""
@@ -129,8 +155,6 @@ def home(request):
     d = {}
     for tweet in tweets:
         links = tweet.all_long_links()
-        if "http://mejorando.la" in links:
-            continue
         for link in links:
             if link in d:
                 d[link].append(tweet)

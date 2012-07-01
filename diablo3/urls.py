@@ -7,6 +7,8 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'tweet.views.home'),
+    url(r'^links/$', 'tweet.views.links'),
+    url(r'^links/(?P<link>.+)/$', 'tweet.views.link'),
     url(r'^hashtags/$', 'tweet.views.hashtags'),
     url(r'^hashtag/(?P<hashtag>[^/]+)/$', 'tweet.views.hashtag'),
     url(r'^mentions/$', 'tweet.views.mentions'),
